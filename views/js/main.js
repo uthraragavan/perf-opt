@@ -19,6 +19,7 @@ cameron *at* udacity *dot* com
 // As you may have realized, this website randomly generates pizzas.
 // Here are arrays of all possible pizza ingredients.
 var pizzaIngredients = {};
+
 pizzaIngredients.meats = [
   "Pepperoni",
   "Sausage",
@@ -422,10 +423,10 @@ var resizePizzas = function(size) {
   changeSliderLabel(size);
 
    // Returns the size difference to change a pizza element from one size to another. Called by changePizzaSlices(size).
-  function determineDx (elem, size) {
-    var oldWidth = elem.offsetWidth;
-    var windowWidth = document.querySelector("#randomPizzas").offsetWidth;
-    var oldSize = oldWidth / windowWidth;
+  function determineDx (elem, size, oldsize) {
+
+
+
 
     // Changes the slider value to a percent width
     function sizeSwitcher (size) {
@@ -442,17 +443,19 @@ var resizePizzas = function(size) {
     }
 
     var newSize = sizeSwitcher(size);
-    var dx = (newSize - oldSize) * windowWidth;
+    var dx = (newSize - oldsize) * windowWidth;
 
     return dx;
   }
 
   // Iterates through pizza elements on the page and changes their widths
   function changePizzaSizes(size) {
-    for (var i = 0; i < document.querySelectorAll(".randomPizzaContainer").length; i++) {
-      var dx = determineDx(document.querySelectorAll(".randomPizzaContainer")[i], size);
-      var newwidth = (document.querySelectorAll(".randomPizzaContainer")[i].offsetWidth + dx) + 'px';
-      document.querySelectorAll(".randomPizzaContainer")[i].style.width = newwidth;
+    var oldWidth = rpc[0].offsetWidth;
+    var oldSize = oldWidth / windowWidth;
+    for (var i = 0; i < rpc.length; i++) {
+      var dx = determineDx(rpc[i], size, oldSize);
+      var newwidth = (oldWidth + dx) + 'px';
+      rpc[i].style.width = newwidth;
     }
   }
 
@@ -472,6 +475,8 @@ for (var i = 2; i < 100; i++) {
   var pizzasDiv = document.getElementById("randomPizzas");
   pizzasDiv.appendChild(pizzaElementGenerator(i));
 }
+var rpc = document.querySelectorAll(".randomPizzaContainer");
+var windowWidth = document.querySelector("#randomPizzas").offsetWidth;
 
 // User Timing API again. These measurements tell you how long it took to generate the initial pizzas
 window.performance.mark("mark_end_generating");

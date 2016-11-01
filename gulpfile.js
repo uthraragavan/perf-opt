@@ -11,6 +11,11 @@ var gulp = require('gulp'),
     gm = require('gulp-gm'),
     imageResize = require('gulp-image-resize');
 var browserSync = require('browser-sync').create();
+var ngrok = require('ngrok');
+var psi = require('psi');
+var sequence = require('run-sequence');
+var site = '';
+var portVal   = 3020;
 
 gulp.task('browser-sync', function() {
     browserSync.init ({
@@ -22,6 +27,41 @@ gulp.task('browser-sync', function() {
     gulp.watch("./*.html").on('change', browserSync.reload);
     gulp.watch("./css/*.css").on('change', browserSync.reload);
     gulp.watch("./js/*.js").on('change', browserSync.reload);
+});
+gulp.task('ngrok-url', function(cb) {
+  return ngrok.connect(3000, function (err, url) {
+    site = url;
+    console.log('serving your tunnel from: ' + site);
+    cb();
+  });
+});
+gulp.task('psi-desktop', function (cb) {
+  psi(site, {
+    nokey: 'true',
+    strategy: 'desktop'
+  }, cb);
+});
+
+gulp.task('psi-mobile', function (cb) {
+  psi(site, {
+    nokey: 'true',
+    strategy: 'mobile'
+  }, cb);
+});
+
+gulp.task('psi-seq', function (cb) {
+  return sequence(
+    'browser-sync',
+    'ngrok-url',
+    'psi-desktop',
+    'psi-mobile',
+    cb
+  );
+});
+
+gulp.task('psi', ['psi-seq'], function() {
+  console.log('Woohoo! Check out your page speed scores!')
+  process.exit();
 });
 
 gulp.task('hello', function() {
